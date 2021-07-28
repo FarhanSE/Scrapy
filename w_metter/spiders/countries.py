@@ -14,4 +14,13 @@ class CountriesSpider(scrapy.Spider):
             # ful_url = f"https://www.worldometers.info{country_link}"
             # ful_url = response.urljoin(country_link)
 
-            yield response.follow(country_link)
+            yield response.follow(country_link, callback=self.country_data)
+    def country_data(slef, response):
+        row = response.xpath("(//table[@class='table table-striped table-bordered table-hover table-condensed table-list'])[1]/tbody/tr")
+        for r in row:
+            year = r.xpath(".//td[1]/text()").get()
+            population = r.xpath(".//td[2]/text()").get()
+            yield {
+                "Year": year,
+                "Population": population
+            }
